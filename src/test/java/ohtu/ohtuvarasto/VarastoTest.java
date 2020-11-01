@@ -13,21 +13,52 @@ import static org.junit.Assert.*;
 public class VarastoTest {
 
     Varasto varasto;
+    Varasto turhaVarasto;
+    Varasto varastoAlkusaldolla;
+    Varasto turhaAlkusaldolla;
+    Varasto varastoYlitaytto;
     double vertailuTarkkuus = 0.0001;
 
     @Before
     public void setUp() {
         varasto = new Varasto(10);
+        turhaVarasto = new Varasto(-10);
+        varastoAlkusaldolla = new Varasto(10, 5);
+        turhaAlkusaldolla = new Varasto(-10, -10);
+        varastoYlitaytto = new Varasto(10, 20);
+        
     }
 
     @Test
     public void konstruktoriLuoTyhjanVaraston() {
         assertEquals(0, varasto.getSaldo(), vertailuTarkkuus);
     }
+    
+    @Test
+    public void konstruktoriLuoVarastonAlkusaldolla() {
+        assertEquals(5, varastoAlkusaldolla.getSaldo(), vertailuTarkkuus);
+        assertEquals(10, varastoAlkusaldolla.getTilavuus(),vertailuTarkkuus);
+    }
 
     @Test
     public void uudellaVarastollaOikeaTilavuus() {
         assertEquals(10, varasto.getTilavuus(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void uusiVarastoEiYlitayty() {
+        assertEquals(10, varastoYlitaytto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void konstruktorillaVoiLuodaKayttokelvottomanVaraston() {
+        assertEquals(0, turhaVarasto.getTilavuus(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void konstruktoriVoiLuodaKayttokelvottomanVarastonSaldolla() {
+        assertEquals(0, turhaAlkusaldolla.getTilavuus(), vertailuTarkkuus);
+        assertEquals(0, turhaAlkusaldolla.getSaldo(), vertailuTarkkuus);
     }
 
     @Test
@@ -36,6 +67,37 @@ public class VarastoTest {
 
         // saldon pitäisi olla sama kun lisätty määrä
         assertEquals(8, varasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test 
+    public void negatiivinenLisaysEiMuutaSaldoa() {
+        varasto.lisaaVarastoon(-8);
+        
+        assertEquals(0, varasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void lisaysTayttaaVainMaksimiin() {
+        varasto.lisaaVarastoon(15);
+        
+        assertEquals(10, varasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void poistetaanNegatiivinenMaara() {
+        varasto.lisaaVarastoon(5);
+        assertEquals(0, varasto.otaVarastosta(-5), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void varastostaSaadaanKaikkiMitaSiellaOnVarastoTyhjenee() {
+        assertEquals(5, varastoAlkusaldolla.otaVarastosta(10), vertailuTarkkuus);
+        assertEquals(0, varastoAlkusaldolla.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void toStringMetodiPalauttaaOikeassaMuodossa() {
+        assertEquals("saldo = 5.0, vielä tilaa 5.0", varastoAlkusaldolla.toString());
     }
 
     @Test
